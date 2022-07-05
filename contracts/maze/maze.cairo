@@ -28,10 +28,6 @@ end
 func cell(idx : felt) -> (cell : Cell):
 end
 
-@storage_var
-func cell_counter() -> (value : felt):
-end
-
 ###########
 # GETTERS #
 ###########
