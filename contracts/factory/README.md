@@ -12,3 +12,12 @@ This is the simplest maze generation algorithm. It works like this:
 2) Look for a random neighbor cell you haven't been to yet. 
 3) If you find one, move there, knocking down the wall between the cells. If you don't find one, back up to the previous cell. 
 4) Repeat steps 2 and 3 until you've been to every cell in the grid.
+
+Functions already implemented :
+
+| Functions                     | Objectives |
+| ----------------------------- | ------------- |
+| ```generate_maze()```         | Generate maze. | 
+| ```_cell_neighbors()```       | Return the only neighbors that don't have downed walls. | 
+| ```_walls_bitwise_and()```    | Check that the neighbor doesn't have any walls knocked down. |
+| ```_cell_in_bounds()```       | Check that the current cell is already inside the maze. |
