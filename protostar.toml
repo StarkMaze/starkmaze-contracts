@@ -12,8 +12,8 @@ game = [
 history = [
     "./contracts/history/history.cairo",
 ]
-maze = [
-    "./contracts/maze/maze.cairo",
+factory = [
+    "./contracts/factory/factory.cairo",
 ]
 
 ["protostar.shared_command_configs"]
