@@ -1,0 +1,30 @@
+[
+    {
+        "data": [
+            {
+                "name": "contract_address",
+                "type": "felt"
+            }
+        ],
+        "keys": [],
+        "name": "maze_contract_deployed",
+        "type": "event"
+    },
+    {
+        "inputs": [
+            {
+                "name": "factory_class_hash_",
+                "type": "felt"
+            }
+        ],
+        "name": "constructor",
+        "outputs": [],
+        "type": "constructor"
+    },
+    {
+        "inputs": [],
+        "name": "deploy_maze_contract",
+        "outputs": [],
+        "type": "function"
+    }
+]

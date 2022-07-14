@@ -4,6 +4,8 @@
 
 Create a perfect maze, the simplest type of maze for a computer to generate and solve. A perfect maze is defined as a maze which has one and only one path from any point in the maze to any other point. This means that the maze has no inaccessible sections, no circular paths, no open areas. 
 
+To go from a grid of unconnected cells to a perfect maze we need to knock down some of those walls. We'll choose a random cell to start from and traverse the grid using depth first search. Whenever a new cell is visited, the wall between the new cell and the previous cell is knocked down.
+
 ## Depth-First Search
  
 This is the simplest maze generation algorithm. It works like this: 

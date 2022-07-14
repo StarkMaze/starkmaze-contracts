@@ -1,0 +1,153 @@
+[
+    {
+        "members": [
+            {
+                "name": "location",
+                "offset": 0,
+                "type": "Location"
+            },
+            {
+                "name": "cell",
+                "offset": 2,
+                "type": "CellData"
+            },
+            {
+                "name": "visited",
+                "offset": 18,
+                "type": "felt"
+            }
+        ],
+        "name": "CellStack",
+        "size": 19,
+        "type": "struct"
+    },
+    {
+        "members": [
+            {
+                "name": "backtrack",
+                "offset": 0,
+                "type": "CardinalDirection"
+            },
+            {
+                "name": "solution",
+                "offset": 4,
+                "type": "CardinalDirection"
+            },
+            {
+                "name": "border",
+                "offset": 8,
+                "type": "CardinalDirection"
+            },
+            {
+                "name": "walls",
+                "offset": 12,
+                "type": "CardinalDirection"
+            }
+        ],
+        "name": "CellData",
+        "size": 16,
+        "type": "struct"
+    },
+    {
+        "members": [
+            {
+                "name": "west",
+                "offset": 0,
+                "type": "felt"
+            },
+            {
+                "name": "south",
+                "offset": 1,
+                "type": "felt"
+            },
+            {
+                "name": "east",
+                "offset": 2,
+                "type": "felt"
+            },
+            {
+                "name": "north",
+                "offset": 3,
+                "type": "felt"
+            }
+        ],
+        "name": "CardinalDirection",
+        "size": 4,
+        "type": "struct"
+    },
+    {
+        "members": [
+            {
+                "name": "row",
+                "offset": 0,
+                "type": "felt"
+            },
+            {
+                "name": "col",
+                "offset": 1,
+                "type": "felt"
+            }
+        ],
+        "name": "Location",
+        "size": 2,
+        "type": "struct"
+    },
+    {
+        "inputs": [],
+        "name": "grid_size",
+        "outputs": [
+            {
+                "name": "n_rows",
+                "type": "felt"
+            },
+            {
+                "name": "n_cols",
+                "type": "felt"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "name": "numRows",
+                "type": "felt"
+            },
+            {
+                "name": "numCols",
+                "type": "felt"
+            }
+        ],
+        "name": "constructor",
+        "outputs": [],
+        "type": "constructor"
+    },
+    {
+        "inputs": [
+            {
+                "name": "cell_stack",
+                "type": "CellStack"
+            }
+        ],
+        "name": "get_cell_location",
+        "outputs": [
+            {
+                "name": "row",
+                "type": "felt"
+            },
+            {
+                "name": "col",
+                "type": "felt"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "generate_maze",
+        "outputs": [],
+        "type": "function"
+    }
+]
