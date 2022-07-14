@@ -52,14 +52,14 @@ func deploy_maze_contract{
         syscall_ptr : felt*,
         pedersen_ptr : HashBuiltin*,
         range_check_ptr,
-    }():
+    }(width : felt):
     let (current_salt) = salt.read()
     let (class_hash) = factory_class_hash.read()
     let (contract_address) = deploy(
         class_hash=class_hash,
         contract_address_salt=current_salt,
-        constructor_calldata_size=0,
-        constructor_calldata=cast(new (), felt*),
+        constructor_calldata_size=1,
+        constructor_calldata=cast(new (width, ), felt*),
     )
 
     salt.write(value=current_salt + 1)
