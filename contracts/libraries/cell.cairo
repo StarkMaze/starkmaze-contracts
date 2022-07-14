@@ -62,7 +62,7 @@ namespace cell_access:
         )
         assert cell_stack.location = Location(0,0)
         assert cell_stack.visited = 1
-        return (cell_stack=cell_stack)
+        return (entry_point=cell_stack)
     end
 
     func neighbors{
@@ -80,44 +80,30 @@ namespace cell_access:
 
         let wall_bits = CardinalDirection(1,1,1,1)
         # Get current cell loc
-        let (row, col) = get_cell_location(current_cell)
+        let (row, col) = get_loc(current_cell)
         # Check dirs neighbors
-        #let neighbor_cell_row = row + dirs[dir_counter].row
-        #let neighbor_cell_col = col + dirs[dir_counter].col
-        let neighbor_cell_row = row + dirs[0].row
-        let neighbor_cell_col = col + dirs[0].col
+        let neighbor_cell_row = row + directions[0].row
+        let neighbor_cell_col = col + directions[0].col
 
         # Check if neighbor is in grid range
         # WARNING : Check if function stop after assert
-        _cell_in_bounds(neighbor_cell_row, neighbor_cell_col)
-
-        let neighbor_cell_loc : Location = Location(neighbor_cell_row, neighbor_cell_col)
-        let neighbor_cell_data : CellData = CellData(
+        # is_in_bounds(neighbor_cell_row, neighbor_cell_col)
+        local neighbor : CellStack
+        assert neighbor.location = Location(neighbor_cell_row, neighbor_cell_col)
+        assert neighbor.cell = CellData(
             CardinalDirection(0,0,0,0),
             CardinalDirection(0,0,0,0),
             CardinalDirection(0,0,0,0),
             CardinalDirection(0,0,0,0)
         )
-        # Create neighbor cell
-        let neighbor : CellStack = CellStack(neighbor_cell_loc, neighbor_cell_data, 0)
+        assert neighbor.visited = 0
 
         # Check if neighbor is unvisited
         # WARNING : Check if function stop after assert
-        _walls_bitwise_and(neighbor, wall_bits)
+        walls_bitwise_and(neighbor, wall_bits)
         assert unvisited_neighbors[0] = Compass(neighbor, dir_counter)
 
-        return neighbors(unvisited_neighbors + 1, current_cell, dirs + 1, dir_counter + 1
-    end
-
-    func is_in_bounds{
-            syscall_ptr : felt*, 
-            pedersen_ptr : HashBuiltin*, 
-            range_check_ptr
-        }(col : felt, row : felt):
-        let (max_row, max_col) = grid_size()
-        assert_in_range(row, 0, max_row)
-        assert_in_range(col, 0, max_col)
-        return ()
+        return neighbors(unvisited_neighbors + 1, current_cell, directions + 1, dir_counter + 1)
     end
 
     func connect{
@@ -144,6 +130,37 @@ namespace cell_access:
             
         end
 
+        return ()
+    end
+
+    func get_loc{
+            syscall_ptr : felt*, 
+            pedersen_ptr : HashBuiltin*, 
+            range_check_ptr
+        }(cell_stack : CellStack) -> (row : felt, col : felt):
+        let cell_row = cell_stack.location.row
+        let cell_col = cell_stack.location.col
+
+        return (row=cell_row, col=cell_col)
+    end
+
+    # Check that the neighbor doesn't have any walls knocked down
+    func walls_bitwise_and{
+            syscall_ptr : felt*, 
+            pedersen_ptr : HashBuiltin*, 
+            bitwise_ptr : BitwiseBuiltin*,
+            range_check_ptr
+        }(cell : CellStack, wall_bits : CardinalDirection):
+        alloc_locals
+
+        let (west_bit) = bitwise_and(cell.cell.walls.west, wall_bits.west)
+        assert_not_equal(west_bit, 1)
+        let (south_bit) = bitwise_and(cell.cell.walls.south, wall_bits.south)
+        assert_not_equal(south_bit, 1)
+        let (east_bit) = bitwise_and(cell.cell.walls.east, wall_bits.east)
+        assert_not_equal(east_bit, 1)
+        let (north_bit) = bitwise_and(cell.cell.walls.north, wall_bits.north)
+        assert_not_equal(north_bit, 1)
         return ()
     end
     
