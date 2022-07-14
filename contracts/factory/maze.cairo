@@ -105,13 +105,14 @@ end
 # EXTERNALS #
 #############
 
-@external
 func generate_maze{
         syscall_ptr : felt*, 
         pedersen_ptr : HashBuiltin*, 
         bitwise_ptr : BitwiseBuiltin*,
         range_check_ptr
-    }() -> ():
+    }() -> (grid : CellStack**):
+    alloc_locals
+
     # Create 2D array to store numRows * numCols CellStacks
     let (grid : CellStack**) = alloc()
     # Array of unvisited neighbors cells
@@ -142,7 +143,7 @@ func generate_maze{
     # end loop
     #
 
-    return ()
+    return (grid)
 end
 
 #############
@@ -193,7 +194,6 @@ func _cell_neighbors{
     assert unvisited_neighbors[0] = Compass(neighbor, dir_counter)
 
     return _cell_neighbors(unvisited_neighbors + 1, current_cell, dirs + 1, dir_counter + 1)
-    
 end
 
 # Check that the neighbor doesn't have any walls knocked down
@@ -202,19 +202,34 @@ func _walls_bitwise_and{
         pedersen_ptr : HashBuiltin*, 
         bitwise_ptr : BitwiseBuiltin*,
         range_check_ptr
-    }(neighbor : CellStack, wall_bits : CardinalDirection):
+    }(cell : CellStack, wall_bits : CardinalDirection):
     alloc_locals
 
-    let (west_bit) = bitwise_and(neighbor.cell.walls.west, wall_bits.west)
+    let (west_bit) = bitwise_and(cell.cell.walls.west, wall_bits.west)
     assert_not_equal(west_bit, 1)
-    let (south_bit) = bitwise_and(neighbor.cell.walls.south, wall_bits.south)
+    let (south_bit) = bitwise_and(cell.cell.walls.south, wall_bits.south)
     assert_not_equal(south_bit, 1)
-    let (east_bit) = bitwise_and(neighbor.cell.walls.east, wall_bits.east)
+    let (east_bit) = bitwise_and(cell.cell.walls.east, wall_bits.east)
     assert_not_equal(east_bit, 1)
-    let (north_bit) = bitwise_and(neighbor.cell.walls.north, wall_bits.north)
+    let (north_bit) = bitwise_and(cell.cell.walls.north, wall_bits.north)
     assert_not_equal(north_bit, 1)
-
     return ()
+end
+
+func _walls_bitwise_or{
+        syscall_ptr : felt*, 
+        pedersen_ptr : HashBuiltin*, 
+        bitwise_ptr : BitwiseBuiltin*,
+        range_check_ptr
+    }(cell : CellStack, direction_bits : CardinalDirection) -> (knocked_down_wall : CardinalDirection):
+    alloc_locals
+
+    let (west_bit) = bitwise_or(cell.cell.walls.west, direction_bits.west)
+    let (south_bit) = bitwise_or(cell.cell.walls.south, direction_bits.south)
+    let (east_bit) = bitwise_or(cell.cell.walls.east, direction_bits.east)
+    let (north_bit) = bitwise_or(cell.cell.walls.north, direction_bits.north)
+
+    return (CardinalDirection(west_bit, south_bit, east_bit, north_bit))
 end
 
 # Check if current cell is already inside of the maze
@@ -232,9 +247,28 @@ end
 func _connect_cells{
         syscall_ptr : felt*, 
         pedersen_ptr : HashBuiltin*, 
+        bitwise_ptr : BitwiseBuiltin*,
         range_check_ptr
-    }(from_cell : CellStack, to_cell : CellStack, compass_index : Compass*):
-    
+    }(from_cell : CellStack, to_cell : CellStack, compass : Compass):
+    let compass_index = compass.cardinal_direction
+    if compass_index == 0:
+        let west_bits = CardinalDirection(1,0,0,0)
+        
+    end
+    if compass_index == 1:
+        let south_bits = CardinalDirection(0,1,0,0) 
+        
+    end
+    if compass_index== 2:
+        let east_bits = CardinalDirection(0,0,1,0) 
+        
+    end
+    if compass_index == 3:
+        let north_bits = CardinalDirection(0,0,0,1) 
+        
+    end
+
+
     return ()
 end
 
