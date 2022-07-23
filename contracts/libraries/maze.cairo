@@ -5,7 +5,8 @@ from starkware.cairo.common.alloc import alloc
 from starkware.cairo.common.uint256 import (Uint256, uint256_add)
 
 from contracts.libraries.structs import Grid, Location
-from contracts.libraries.cell import cell_access, direction_access
+from contracts.libraries.cell import cell_access
+from contracts.libraries.direction import direction_access
 
 const TRUE = 'TRUE'
 const FALSE = 'FALSE'
@@ -30,7 +31,7 @@ end
 func count_visited_cells() -> (counter : Uint256):
 end
 
-namespace maze_acess:
+namespace maze_access:
 
     @constructor
     func constructor{
@@ -56,18 +57,21 @@ namespace maze_acess:
         return ()
     end
 
+    @external
     func build{
             syscall_ptr : felt*, 
             pedersen_ptr : HashBuiltin*, 
             range_check_ptr
         }() -> (grid : Grid):
-        let grid = maze.read()
-        let entry_cell = entry.read()
-        let nb_cells = total_cells.read()
+        alloc_locals
+
+        let grid : Grid = maze.read()
+        let entry_cell : Location = entry.read()
+        let (nb_cells) = total_cells.read()
 
         _build(entry_cell, grid, nb_cells)
 
-        return ()
+        return (grid=grid)
     end
 
 end
@@ -81,6 +85,7 @@ func _build{
 
     cell_access.mark_visited(current, 'TRUE')
 
+    # Mark entry cell as visited
     let (counter) = count_visited_cells.read()
     let (res,_) = uint256_add(counter, Uint256(1, 0))
     count_visited_cells.write(res)
@@ -89,7 +94,7 @@ func _build{
     let dirs : Location* = direction_access.all()
     # Create array to store all neighbors
     let (local neighbors : Location*) = alloc()
-    cell_access.neighbors(current, 4, neighbors, 4, dirs)
+    let (nbors_len : felt, nbors : Location*) = _neighbors(current, 4, neighbors, 4, dirs)
     
     #let (res) = _in_bounds(neighbor_cell_x, neighbor_cell_y)
     #if  res == TRUE:
@@ -100,11 +105,34 @@ func _build{
     return _build(current, grid, nb_cells)
 end
 
+@external
+func _neighbors{
+        syscall_ptr : felt*, 
+        pedersen_ptr : HashBuiltin*, 
+        range_check_ptr
+    }(current : Location, neighbors_len : felt, neighbors : Location*, dirs_len : felt, dirs : Location*) -> (nbors_len : felt, nbors : Location*):
+    alloc_locals
+
+    # Loop to check every directions
+    if dirs_len == 0:
+        return (neighbors_len, neighbors)
+    end
+
+    # Check dirs neighbors
+    let neighbor_cell_x = current.x + dirs[0].x
+    let neighbor_cell_y = current.y + dirs[0].y
+
+    assert [neighbors] = Location(neighbor_cell_x, neighbor_cell_y)
+
+    return _neighbors(current, neighbors_len - 1, neighbors + 1, dirs_len - 1, dirs + 1)
+end
+
+
 func _in_bounds{
         syscall_ptr : felt*, 
         pedersen_ptr : HashBuiltin*, 
         range_check_ptr
     }(x : felt, y : felt) -> (bool : felt):
-
+    
     return ('')
 end
