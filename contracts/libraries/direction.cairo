@@ -47,8 +47,10 @@ namespace direction_access:
         if dir == SOUTH:
             return (0, 1)
         end
-        # if dir == WEST
-        return (-1, 0)
+        if dir == WEST:
+            return (-1, 0)
+        end
+        return ('', '')
     end
 
 end
