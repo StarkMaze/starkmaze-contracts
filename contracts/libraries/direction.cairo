@@ -18,6 +18,8 @@ namespace direction_access:
             pedersen_ptr : HashBuiltin*, 
             range_check_ptr
         }() -> (dirs : Location*):
+        alloc_locals
+        
         local dirs : Location*
         assert dirs[0] = Location(0, -1)
         assert dirs[1] = Location(1, 0)
