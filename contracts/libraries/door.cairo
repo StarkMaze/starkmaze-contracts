@@ -2,29 +2,64 @@
 
 from starkware.cairo.common.cairo_builtins import HashBuiltin, BitwiseBuiltin
 from starkware.cairo.common.alloc import alloc
+from starkware.cairo.common.bitwise import bitwise_and, bitwise_or
 
 from contracts.libraries.structs import Door, Location
 
 @storage_var
-func door() -> (door : Door):
+func doors() -> (door : Door):
 end
 
 namespace door_access:
 
-    func north{}():
+    func add{
+            syscall_ptr : felt*, 
+            pedersen_ptr : HashBuiltin*, 
+            range_check_ptr
+        }(door: Door):
+        doors.write(door)
         return ()
     end
 
-    func west{}():
-        return ()
+    func contains{
+            syscall_ptr : felt*, 
+            pedersen_ptr : HashBuiltin*, 
+            range_check_ptr
+        }() -> (bool : felt):
+        return doors.read()
     end
 
-    func south{}():
-        return ()
+
+    func north{
+            syscall_ptr : felt*, 
+            pedersen_ptr : HashBuiltin*, 
+            range_check_ptr
+        }(loc: Location) -> (bool : felt):
+        return _open_in_direction(loc, '1')
     end
 
-    func east{}():
-        return ()
+    func west{
+            syscall_ptr : felt*, 
+            pedersen_ptr : HashBuiltin*, 
+            range_check_ptr
+        }(loc: Location) -> (bool : felt):
+        return _open_in_direction(loc, '2')
+    end
+
+    func south{
+            syscall_ptr : felt*, 
+            pedersen_ptr : HashBuiltin*, 
+            range_check_ptr
+        }(loc: Location) -> (bool : felt):
+        return _open_in_direction(loc, '4')
+    end
+
+    func east{
+            syscall_ptr : felt*, 
+            pedersen_ptr : HashBuiltin*, 
+            range_check_ptr
+        }(loc: Location) -> (bool : felt):
+        return _open_in_direction(loc, '8')
     end
 
 end
