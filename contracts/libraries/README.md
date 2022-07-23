@@ -1,23 +1,21 @@
-# Core Contract : Maze.cairo
+# Contracts
 
-## Our objective
-
-Create a perfect maze, the simplest type of maze for a computer to generate and solve. A perfect maze is defined as a maze which has one and only one path from any point in the maze to any other point. This means that the maze has no inaccessible sections, no circular paths, no open areas. 
-
-## Depth-First Search
- 
-This is the simplest maze generation algorithm. It works like this: 
-
-1) Start at a random cell in the grid. 
-2) Look for a random neighbor cell you haven't been to yet. 
-3) If you find one, move there, knocking down the wall between the cells. If you don't find one, back up to the previous cell. 
-4) Repeat steps 2 and 3 until you've been to every cell in the grid.
-
-Functions already implemented :
-
-| Functions                     | Objectives |
+| Files                     | Objectives |
 | ----------------------------- | ------------- |
-| ```generate_maze()```         | Generate maze. | 
-| ```_cell_neighbors()```       | Return the only neighbors that don't have downed walls. | 
-| ```_walls_bitwise_and()```    | Check that the neighbor doesn't have any walls knocked down. |
-| ```_cell_in_bounds()```       | Check that the current cell is already inside the maze. |
+| maze.cairo         | Generate maze. | 
+| cell.cairo      | Check cell’s neighbors & mark the cell as visited. | 
+| direction.cairo   | Check that the neighbor doesn't have any walls knocked down. |
+| door.cairo       |  |
+| structs.cairo       | Structs. |
+
+# How does it work?
+
+## Depth First Search Algorithm
+
+### Steps :
+
+1) Configure your grid's size (width, height)
+2) Define an entry and exit cell.
+3) Get current cell and search for his neighbors in using compass points.
+4) Move in the direction of one of the cardinal points if the cell is not visited, otherwise mark them as visited.
+5) 
