@@ -13,23 +13,26 @@ const WEST  = '8'
 namespace direction_access:
 
     # Array of dirs that allow us to check every ajdacent cell
+    @external
     func all{
             syscall_ptr : felt*, 
             pedersen_ptr : HashBuiltin*, 
             range_check_ptr
-        }() -> (dirs : Location*):
+        }() -> (dirs_len : felt, dirs : Location*):
         alloc_locals
-        
+
+        let dirs_len = 4
         local dirs : Location*
         assert dirs[0] = Location(0, -1)
         assert dirs[1] = Location(1, 0)
         assert dirs[2] = Location(0, 1)
         assert dirs[3] = Location(-1, 0)
 
-        return (dirs=dirs)
+        return (dirs_len=dirs_len, dirs=dirs)
     end
 
     # Get location of a direction 
+    @view
     func location{
             syscall_ptr : felt*, 
             pedersen_ptr : HashBuiltin*, 
@@ -44,18 +47,8 @@ namespace direction_access:
         if dir == SOUTH:
             return (0, 1)
         end
-        if dir == WEST:
-            return (-1, 0)
-        end
-    end
-
-    # Get opposite of a direction
-    func opposite{
-            syscall_ptr : felt*, 
-            pedersen_ptr : HashBuiltin*, 
-            range_check_ptr
-        }():
-        return ()
+        # if dir == WEST
+        return (-1, 0)
     end
 
 end
