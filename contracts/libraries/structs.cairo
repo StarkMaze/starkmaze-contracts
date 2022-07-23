@@ -11,6 +11,11 @@ end
 struct Grid:
     member width : felt
     member height : felt
-    member doors : Door*
-    member visited : Location*
 end
+
+#struct Grid:
+#    member width : felt
+#    member height : felt
+#    member doors : Door*
+#    member visited : Location*
+#end
