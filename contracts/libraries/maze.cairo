@@ -21,6 +21,10 @@ end
 func visited_cells() -> (value : felt):
 end
 
+@storage_var
+func grid() -> (maze : Maze):
+end
+
 namespace maze_acess:
 
     @constructor
@@ -36,6 +40,7 @@ namespace maze_acess:
         assert maze.cell_count = width * width
 
         let (entry_point) = cell_access.entry_point()
+        grid.write(maze)
         start.write(entry_point)
         visited_cells.write(1)
         
@@ -53,7 +58,7 @@ namespace maze_acess:
         }(width : felt) -> (maze : Maze):
         alloc_locals
 
-        local maze : Maze
+        let maze : Maze = grid.read()
         
         # Array of unvisited neighbors cells
         let (unvisited_neighbors : Compass*) = alloc()

@@ -46,6 +46,19 @@ end
 
 namespace cell_access:
 
+    @view
+    func get_loc{
+            syscall_ptr : felt*, 
+            pedersen_ptr : HashBuiltin*, 
+            range_check_ptr
+        }(cell_stack : CellStack) -> (row : felt, col : felt):
+        let cell_row = cell_stack.location.row
+        let cell_col = cell_stack.location.col
+
+        return (row=cell_row, col=cell_col)
+    end
+
+    # Define the starting cell of the maze
     func entry_point{
             syscall_ptr : felt*, 
             pedersen_ptr : HashBuiltin*, 
@@ -78,12 +91,15 @@ namespace cell_access:
             return (unvisited_neighbors)
         end
 
+        # The bits that allow us to check if the neighbor has all the walls up.
         let wall_bits = CardinalDirection(1,1,1,1)
         # Get current cell loc
         let (row, col) = get_loc(current_cell)
         # Check dirs neighbors
         let neighbor_cell_row = row + directions[0].row
         let neighbor_cell_col = col + directions[0].col
+
+
 
         # Check if neighbor is in grid range
         # WARNING : Check if function stop after assert
@@ -98,12 +114,24 @@ namespace cell_access:
         )
         assert neighbor.visited = 0
 
+
+
         # Check if neighbor is unvisited
         # WARNING : Check if function stop after assert
         walls_bitwise_and(neighbor, wall_bits)
         assert unvisited_neighbors[0] = Compass(neighbor, dir_counter)
 
         return neighbors(unvisited_neighbors + 1, current_cell, directions + 1, dir_counter + 1)
+    end
+
+    func is_in_bounds{
+            syscall_ptr : felt*, 
+            pedersen_ptr : HashBuiltin*, 
+            range_check_ptr
+        }(row : felt, col : felt) -> ():
+        # assert_in_range(row, width, width * width)
+        # assert_le(row, width)
+        # assert_le(col, width)
     end
 
     func connect{
@@ -115,7 +143,8 @@ namespace cell_access:
         let compass_index = compass.cardinal_direction
         if compass_index == 0:
             let west_bits = CardinalDirection(1,0,0,0)
-            
+            let (and, xor, or) = bitwise_operations(from_cell.cell.walls, west_bits)
+            assert from_cell.from_cell.cell.walls = or
         end
         if compass_index == 1:
             let south_bits = CardinalDirection(0,1,0,0) 
@@ -133,17 +162,6 @@ namespace cell_access:
         return ()
     end
 
-    func get_loc{
-            syscall_ptr : felt*, 
-            pedersen_ptr : HashBuiltin*, 
-            range_check_ptr
-        }(cell_stack : CellStack) -> (row : felt, col : felt):
-        let cell_row = cell_stack.location.row
-        let cell_col = cell_stack.location.col
-
-        return (row=cell_row, col=cell_col)
-    end
-
     # Check that the neighbor doesn't have any walls knocked down
     func walls_bitwise_and{
             syscall_ptr : felt*, 
@@ -153,14 +171,21 @@ namespace cell_access:
         }(cell : CellStack, wall_bits : CardinalDirection):
         alloc_locals
 
-        let (west_bit) = bitwise_and(cell.cell.walls.west, wall_bits.west)
-        assert_not_equal(west_bit, 1)
-        let (south_bit) = bitwise_and(cell.cell.walls.south, wall_bits.south)
-        assert_not_equal(south_bit, 1)
-        let (east_bit) = bitwise_and(cell.cell.walls.east, wall_bits.east)
-        assert_not_equal(east_bit, 1)
-        let (north_bit) = bitwise_and(cell.cell.walls.north, wall_bits.north)
-        assert_not_equal(north_bit, 1)
+        let check_bit = 0
+
+        let (and, _, _) = bitwise_operations(cell.cell.walls.west, wall_bits.west)
+        let (and, _, _) = bitwise_operations(cell.cell.walls.south, wall_bits.south)
+        let (and, _, _) = bitwise_operations(cell.cell.walls.east, wall_bits.east)
+        let (and, _, _) = bitwise_operations(cell.cell.walls.north, wall_bits.north)
+
+        #let (west_bit) = bitwise_and(cell.cell.walls.west, wall_bits.west)
+        #assert_not_equal(west_bit, 1)
+        #let (south_bit) = bitwise_and(cell.cell.walls.south, wall_bits.south)
+        #assert_not_equal(south_bit, 1)
+        #let (east_bit) = bitwise_and(cell.cell.walls.east, wall_bits.east)
+        #assert_not_equal(east_bit, 1)
+        #let (north_bit) = bitwise_and(cell.cell.walls.north, wall_bits.north)
+        #assert_not_equal(north_bit, 1)
         return ()
     end
     
