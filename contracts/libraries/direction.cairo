@@ -5,10 +5,10 @@ from starkware.cairo.common.alloc import alloc
 
 from contracts.libraries.structs import Location
 
-const NORTH = '1'
-const EAST  = '2'
-const SOUTH = '4'
-const WEST  = '8'
+const NORTH = 1
+const EAST  = 2
+const SOUTH = 4
+const WEST  = 8
 
 namespace direction_access:
 
