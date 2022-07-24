@@ -7,26 +7,31 @@ from starkware.cairo.common.bitwise import bitwise_and, bitwise_or
 from contracts.libraries.structs import Door, Location
 
 @storage_var
-func doors() -> (door : Door):
+func doors(door : Door) -> (bool : felt):
 end
 
 namespace door_access:
 
+    @external
     func add{
             syscall_ptr : felt*, 
             pedersen_ptr : HashBuiltin*, 
             range_check_ptr
-        }(door: Door):
-        doors.write(door)
+        }(from_ : Location, to : Location):
+        let door : Door = Door(from_, to)
+        doors.write(door, 'TRUE')
         return ()
     end
 
+    @view
     func contains{
             syscall_ptr : felt*, 
             pedersen_ptr : HashBuiltin*, 
             range_check_ptr
-        }() -> (bool : felt):
-        return doors.read()
+        }(from_ : Location, to : Location) -> (bool : felt):
+        let door : Door = Door(from_, to)
+        let (bool) = doors.read(door)
+        return (bool=bool)
     end
 
 
