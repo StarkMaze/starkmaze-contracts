@@ -6,14 +6,8 @@ libs_path = "./lib"
 
 
 ["protostar.contracts"]
-game = [
-    "./contracts/game/game.cairo",
-]
-history = [
-    "./contracts/history/history.cairo",
-]
-factory = [
-    "./contracts/factory/factory.cairo",
+main = [
+    "./contracts/main.cairo",
 ]
 
 ["protostar.shared_command_configs"]
