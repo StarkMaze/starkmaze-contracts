@@ -3,8 +3,6 @@
 from starkware.cairo.common.cairo_builtins import HashBuiltin
 from starkware.cairo.common.cairo_builtins import BitwiseBuiltin
 
-from starkware.cairo.common.math import assert_not_equal
-
 from contracts.libraries.structs import Grid
 from contracts.board.maze import maze_access, maze
 
