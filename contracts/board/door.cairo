@@ -5,7 +5,6 @@ from starkware.cairo.common.alloc import alloc
 from starkware.cairo.common.bitwise import bitwise_or
 
 from contracts.libraries.structs import Door, Location
-
 from contracts.libraries.constants import TRUE, FALSE
 
 @storage_var

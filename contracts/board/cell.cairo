@@ -5,7 +5,7 @@ from starkware.cairo.common.alloc import alloc
 from starkware.cairo.common.uint256 import Uint256
 
 from contracts.libraries.structs import Location
-from contracts.libraries.direction import direction_access
+from contracts.board.direction import direction_access
 
 @storage_var
 func visited_cells(loc : Location) -> (bool : felt):

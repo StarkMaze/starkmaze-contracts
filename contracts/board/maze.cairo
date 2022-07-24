@@ -9,10 +9,11 @@ from starkware.cairo.common.bitwise import bitwise_and
 from starkware.cairo.common.uint256 import Uint256, uint256_add
 
 from contracts.libraries.structs import Grid, Location
-from contracts.libraries.cell import cell_access
-from contracts.libraries.direction import direction_access
-from contracts.libraries.door import door_access
 from contracts.libraries.randomness import randomness_access
+
+from contracts.board.cell import cell_access
+from contracts.board.direction import direction_access
+from contracts.board.door import door_access
 
 from contracts.libraries.constants import TRUE, FALSE
 
