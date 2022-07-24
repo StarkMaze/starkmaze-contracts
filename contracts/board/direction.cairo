@@ -37,7 +37,7 @@ namespace direction_access:
             syscall_ptr : felt*, 
             pedersen_ptr : HashBuiltin*, 
             range_check_ptr
-        }(dir : felt) -> (row : felt, col : felt):
+        }(dir : felt) -> (x : felt, y : felt):
         if dir == NORTH:
             return (0, -1)
         end
