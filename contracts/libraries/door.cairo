@@ -36,7 +36,7 @@ namespace door_access:
     end
 
     @external
-    func north{
+    func open_north{
             syscall_ptr : felt*, 
             pedersen_ptr : HashBuiltin*, 
             range_check_ptr,
@@ -47,7 +47,7 @@ namespace door_access:
     end
 
     @external
-    func east{
+    func open_east{
             syscall_ptr : felt*, 
             pedersen_ptr : HashBuiltin*, 
             range_check_ptr,
@@ -58,7 +58,7 @@ namespace door_access:
     end
 
     @external
-    func south{
+    func open_south{
             syscall_ptr : felt*, 
             pedersen_ptr : HashBuiltin*, 
             range_check_ptr,
@@ -69,7 +69,7 @@ namespace door_access:
     end
 
     @external
-    func west{
+    func open_west{
             syscall_ptr : felt*, 
             pedersen_ptr : HashBuiltin*, 
             range_check_ptr,
