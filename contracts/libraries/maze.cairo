@@ -1,15 +1,18 @@
 %lang starknet
 
-from starkware.cairo.common.cairo_builtins import HashBuiltin, BitwiseBuiltin
+from starkware.cairo.common.cairo_builtins import HashBuiltin
+from starkware.cairo.common.cairo_builtins import BitwiseBuiltin
 from starkware.cairo.common.alloc import alloc
 from starkware.cairo.common.hash import hash2
-from starkware.cairo.common.math_cmp import is_in_range
+from starkware.cairo.common.math_cmp import (is_in_range, is_not_zero)
 from starkware.cairo.common.bitwise import bitwise_and
-from starkware.cairo.common.uint256 import (Uint256, uint256_add)
+from starkware.cairo.common.uint256 import Uint256, uint256_add
 
 from contracts.libraries.structs import Grid, Location
 from contracts.libraries.cell import cell_access
 from contracts.libraries.direction import direction_access
+from contracts.libraries.door import door_access
+from contracts.libraries.randomness import randomness_access
 
 from contracts.libraries.constants import TRUE, FALSE
 
@@ -62,19 +65,16 @@ namespace maze_access:
     @external
     func build{
             syscall_ptr : felt*, 
-            pedersen_ptr : HashBuiltin*, 
+            pedersen_ptr : HashBuiltin*,
             range_check_ptr,
             bitwise_ptr : BitwiseBuiltin*
-        }() -> (grid : Grid):
+        }():
         alloc_locals
-
-        let grid : Grid = maze.read()
         let entry_cell : Location = entry.read()
-        # let (nb_cells) = total_cells.read()
 
-        _build(entry_cell, grid)
+        _build(entry_cell)
 
-        return (grid=grid)
+        return ()
     end
 
 end
@@ -84,37 +84,65 @@ func _build{
         pedersen_ptr : HashBuiltin*, 
         range_check_ptr,
         bitwise_ptr : BitwiseBuiltin*
-    }(current : Location, grid : Grid) -> (grid : Grid):
+    }(current : Location):
     alloc_locals
 
-    cell_access.mark_visited(current, TRUE)
-
     # Mark entry cell as visited
-    let (counter) = count_visited_cells.read()
-    let (res,_) = uint256_add(counter, Uint256(1, 0))
-    count_visited_cells.write(res)
+    cell_access.mark_visited(current, TRUE)
+    
+    # Store current cell
+    let (idx) = count_visited_cells.read()
+    cell_access.set_cell(idx, current)
 
     # Get all possible dirs
     let dirs : Location* = direction_access.all()
     # Create array to store all neighbors
     let (local neighbors : Location*) = alloc()
     let (nbors_len : felt, nbors : Location*) = _neighbors(current, 4, neighbors, 4, dirs)
+    let (res_len) = is_not_zero(nbors_len)
 
-    # If nbors_len > 0: 
-        # Pseudo random number generator
-        # Choose randomly one nbors
-        # If visited -> is_visited(nbor):
-            # Mark new cell as visited -> mark_visited(nbor, TRUE)
-            # Add a door between current and new cell -> door_access.add(current, nbor)
-            # Push new cell as current cell -> return _build(nbor, grid)
-            # Push to Stack
-        # Else:
-            # Pop from Stack to current cell
-        # End
-    # End
+    if res_len == TRUE: 
     
-    return _build(current, grid)
+        # Choose randomly one nbors
+        # let (rand) = randomness_access.generate{hash_ptr=pedersen_ptr}(0, nbors_len)
+        let rand = 0
+        let nbor : Location = nbors[rand]
+        let (visited) = cell_access.is_visited(nbor)
+        
+        tempvar syscall_ptr : felt* = syscall_ptr
+        tempvar pedersen_ptr : HashBuiltin* = pedersen_ptr
+        tempvar range_check_ptr = range_check_ptr
+
+        if visited == FALSE:
+            cell_access.mark_visited(nbor, TRUE)
+            door_access.add(current, nbor)
+            # Push to Stack for solution
+            let (res,_) = uint256_add(idx, Uint256(1, 0))
+            count_visited_cells.write(res)
+
+            tempvar syscall_ptr : felt* = syscall_ptr
+            tempvar pedersen_ptr : HashBuiltin* = pedersen_ptr
+            tempvar range_check_ptr = range_check_ptr
+
+            return _build(nbor)
+        else:
+            # Pop from Stack to current cell for solution
+            tempvar syscall_ptr : felt* = syscall_ptr
+            tempvar pedersen_ptr : HashBuiltin* = pedersen_ptr
+            tempvar range_check_ptr = range_check_ptr
+        end
+    else:
+        tempvar syscall_ptr : felt* = syscall_ptr
+        tempvar pedersen_ptr : HashBuiltin* = pedersen_ptr
+        tempvar range_check_ptr = range_check_ptr
+    end
+    
+    return ()
 end
+
+# tempvar pedersen_ptr : HashBuiltin* = pedersen_ptr
+# tempvar syscall_ptr : felt* = syscall_ptr
+# tempvar range_check_ptr = range_check_ptr
 
 func _neighbors{
         syscall_ptr : felt*, 
@@ -156,29 +184,11 @@ func _in_bounds{
     let (res_y) = is_in_range(y, 0, grid.height)
     let (x_and_y) = bitwise_and(res_x, res_y)
 
-    if x_and_y == 1:
+    if x_and_y == TRUE:
         return (TRUE)
     end
     return (FALSE)
 end
-
-#
-# Comment pourrais-je avoir un tel résultat?
-#
-# if 0 < x < max_x:
-    # Do something
-# else:
-    # Do something
-#
-
-# 
-# Sachant qu'il n'y a pas d'opérateur "<" du au fait que Cairo soit un langage de bas niveau
-# et que si j'utilise un assert cela va me faire une erreur et stopper ma function. Je souhaite 
-# faire en sorte que si mon élément n'est pas dans mon range je puisse exécuter d'autres instructions
-#
-# assert_in_range(x, max_x, 0)
-#
-
 
 
 
