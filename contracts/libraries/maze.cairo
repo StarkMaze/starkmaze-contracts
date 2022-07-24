@@ -2,14 +2,16 @@
 
 from starkware.cairo.common.cairo_builtins import HashBuiltin, BitwiseBuiltin
 from starkware.cairo.common.alloc import alloc
+from starkware.cairo.common.hash import hash2
+from starkware.cairo.common.math_cmp import is_in_range
+from starkware.cairo.common.bitwise import bitwise_and
 from starkware.cairo.common.uint256 import (Uint256, uint256_add)
 
 from contracts.libraries.structs import Grid, Location
 from contracts.libraries.cell import cell_access
 from contracts.libraries.direction import direction_access
 
-const TRUE = 'TRUE'
-const FALSE = 'FALSE'
+from contracts.libraries.constants import TRUE, FALSE
 
 @storage_var
 func entry() -> (loc : Location):
@@ -61,15 +63,16 @@ namespace maze_access:
     func build{
             syscall_ptr : felt*, 
             pedersen_ptr : HashBuiltin*, 
-            range_check_ptr
+            range_check_ptr,
+            bitwise_ptr : BitwiseBuiltin*
         }() -> (grid : Grid):
         alloc_locals
 
         let grid : Grid = maze.read()
         let entry_cell : Location = entry.read()
-        let (nb_cells) = total_cells.read()
+        # let (nb_cells) = total_cells.read()
 
-        _build(entry_cell, grid, nb_cells)
+        _build(entry_cell, grid)
 
         return (grid=grid)
     end
@@ -79,11 +82,12 @@ end
 func _build{
         syscall_ptr : felt*, 
         pedersen_ptr : HashBuiltin*, 
-        range_check_ptr
-    }(current : Location, grid : Grid, nb_cells : felt) -> (grid : Grid):
+        range_check_ptr,
+        bitwise_ptr : BitwiseBuiltin*
+    }(current : Location, grid : Grid) -> (grid : Grid):
     alloc_locals
 
-    cell_access.mark_visited(current, 'TRUE')
+    cell_access.mark_visited(current, TRUE)
 
     # Mark entry cell as visited
     let (counter) = count_visited_cells.read()
@@ -95,21 +99,28 @@ func _build{
     # Create array to store all neighbors
     let (local neighbors : Location*) = alloc()
     let (nbors_len : felt, nbors : Location*) = _neighbors(current, 4, neighbors, 4, dirs)
+
+    # If nbors_len > 0: 
+        # Pseudo random number generator
+        # Choose randomly one nbors
+        # If visited -> is_visited(nbor):
+            # Mark new cell as visited -> mark_visited(nbor, TRUE)
+            # Add a door between current and new cell -> door_access.add(current, nbor)
+            # Push new cell as current cell -> return _build(nbor, grid)
+            # Push to Stack
+        # Else:
+            # Pop from Stack to current cell
+        # End
+    # End
     
-    #let (res) = _in_bounds(neighbor_cell_x, neighbor_cell_y)
-    #if  res == TRUE:
-
-    #end
-
-
-    return _build(current, grid, nb_cells)
+    return _build(current, grid)
 end
 
-@external
 func _neighbors{
         syscall_ptr : felt*, 
         pedersen_ptr : HashBuiltin*, 
-        range_check_ptr
+        range_check_ptr,
+        bitwise_ptr : BitwiseBuiltin*
     }(current : Location, neighbors_len : felt, neighbors : Location*, dirs_len : felt, dirs : Location*) -> (nbors_len : felt, nbors : Location*):
     alloc_locals
 
@@ -122,17 +133,52 @@ func _neighbors{
     let neighbor_cell_x = current.x + dirs[0].x
     let neighbor_cell_y = current.y + dirs[0].y
 
-    assert [neighbors] = Location(neighbor_cell_x, neighbor_cell_y)
+    let (res) = _in_bounds(neighbor_cell_x, neighbor_cell_y)
+    if res == TRUE:
+        assert [neighbors] = Location(neighbor_cell_x, neighbor_cell_y)
+        return _neighbors(current, neighbors_len - 1, neighbors + 1, dirs_len - 1, dirs + 1)
+    end
 
-    return _neighbors(current, neighbors_len - 1, neighbors + 1, dirs_len - 1, dirs + 1)
+    return _neighbors(current, neighbors_len - 1, neighbors, dirs_len - 1, dirs + 1)
 end
 
 
 func _in_bounds{
         syscall_ptr : felt*, 
         pedersen_ptr : HashBuiltin*, 
-        range_check_ptr
+        range_check_ptr,
+        bitwise_ptr : BitwiseBuiltin*
     }(x : felt, y : felt) -> (bool : felt):
-    
-    return ('')
+    alloc_locals
+    let grid : Grid = maze.read()
+
+    let (res_x) = is_in_range(x, 0, grid.width)
+    let (res_y) = is_in_range(y, 0, grid.height)
+    let (x_and_y) = bitwise_and(res_x, res_y)
+
+    if x_and_y == 1:
+        return (TRUE)
+    end
+    return (FALSE)
 end
+
+#
+# Comment pourrais-je avoir un tel résultat?
+#
+# if 0 < x < max_x:
+    # Do something
+# else:
+    # Do something
+#
+
+# 
+# Sachant qu'il n'y a pas d'opérateur "<" du au fait que Cairo soit un langage de bas niveau
+# et que si j'utilise un assert cela va me faire une erreur et stopper ma function. Je souhaite 
+# faire en sorte que si mon élément n'est pas dans mon range je puisse exécuter d'autres instructions
+#
+# assert_in_range(x, max_x, 0)
+#
+
+
+
+
