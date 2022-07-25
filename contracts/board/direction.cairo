@@ -22,7 +22,7 @@ namespace direction_access:
         alloc_locals
 
         let dirs_len = 4
-        local dirs : Location*
+        let (local dirs : Location*) = alloc()
         assert dirs[0] = Location(0, -1)
         assert dirs[1] = Location(1, 0)
         assert dirs[2] = Location(0, 1)
