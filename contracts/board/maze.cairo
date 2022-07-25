@@ -1,7 +1,6 @@
 %lang starknet
 
 from starkware.cairo.common.cairo_builtins import HashBuiltin
-from starkware.cairo.common.cairo_builtins import BitwiseBuiltin
 from starkware.cairo.common.alloc import alloc
 from starkware.cairo.common.hash import hash2
 from starkware.cairo.common.math_cmp import (is_in_range, is_not_zero)
@@ -73,7 +72,6 @@ namespace maze_access:
             syscall_ptr : felt*, 
             pedersen_ptr : HashBuiltin*,
             range_check_ptr,
-            bitwise_ptr : BitwiseBuiltin*
         }():
         alloc_locals
         let entry_cell : Location = entry.read()
@@ -98,7 +96,6 @@ func _build{
         syscall_ptr : felt*, 
         pedersen_ptr : HashBuiltin*, 
         range_check_ptr,
-        bitwise_ptr : BitwiseBuiltin*
     }(current : Location):
     alloc_locals
 
@@ -155,15 +152,10 @@ func _build{
     return ()
 end
 
-# tempvar pedersen_ptr : HashBuiltin* = pedersen_ptr
-# tempvar syscall_ptr : felt* = syscall_ptr
-# tempvar range_check_ptr = range_check_ptr
-
 func _neighbors{
         syscall_ptr : felt*, 
         pedersen_ptr : HashBuiltin*, 
         range_check_ptr,
-        bitwise_ptr : BitwiseBuiltin*
     }(current : Location, neighbors_len : felt, neighbors : Location*, dirs_len : felt, dirs : Location*) -> (nbors_len : felt, nbors : Location*):
     alloc_locals
 
@@ -190,16 +182,14 @@ func _in_bounds{
         syscall_ptr : felt*, 
         pedersen_ptr : HashBuiltin*, 
         range_check_ptr,
-        bitwise_ptr : BitwiseBuiltin*
     }(x : felt, y : felt) -> (bool : felt):
     alloc_locals
     let grid : Grid = maze.read()
 
     let (res_x) = is_in_range(x, 0, grid.width)
     let (res_y) = is_in_range(y, 0, grid.height)
-    let (x_and_y) = bitwise_and(res_x, res_y)
 
-    if x_and_y == TRUE:
+    if res_x == TRUE and res_y == TRUE:
         return (TRUE)
     end
     return (FALSE)
