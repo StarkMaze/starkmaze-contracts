@@ -78,7 +78,7 @@ namespace maze_access:
         alloc_locals
         let entry_cell : Location = entry.read()
         # Mark entry cell as visited
-        cell_access.mark_visited(current, TRUE)
+        cell_access.mark_visited(entry_cell, TRUE)
 
         _build(entry_cell)
 
