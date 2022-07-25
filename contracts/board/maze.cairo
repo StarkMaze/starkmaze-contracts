@@ -77,6 +77,8 @@ namespace maze_access:
         }():
         alloc_locals
         let entry_cell : Location = entry.read()
+        # Mark entry cell as visited
+        cell_access.mark_visited(current, TRUE)
 
         _build(entry_cell)
 
@@ -101,9 +103,6 @@ func _build{
         bitwise_ptr : BitwiseBuiltin*
     }(current : Location):
     alloc_locals
-
-    # Mark entry cell as visited
-    cell_access.mark_visited(current, TRUE)
     
     # Store current cell
     let (idx) = count_visited_cells.read()
