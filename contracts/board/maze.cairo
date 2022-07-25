@@ -37,6 +37,11 @@ end
 func count_visited_cells() -> (counter : Uint256):
 end
 
+
+@storage_var
+func player_location(address : felt) -> (loc : Location):
+end
+
 namespace maze_access:
 
     @external
@@ -76,6 +81,15 @@ namespace maze_access:
         _build(entry_cell)
 
         return ()
+    end
+
+    @view
+    func get_player_location{
+            syscall_ptr : felt*, 
+            pedersen_ptr : HashBuiltin*,
+            range_check_ptr,
+        }(address : felt) -> (loc : Location):
+        return player_location.read(address)
     end
 
 end
