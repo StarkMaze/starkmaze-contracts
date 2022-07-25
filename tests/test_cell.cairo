@@ -3,8 +3,6 @@
 from starkware.cairo.common.cairo_builtins import HashBuiltin
 from starkware.cairo.common.uint256 import Uint256
 
-from starkware.cairo.common.math import assert_not_equal
-
 from contracts.libraries.structs import Location
 from contracts.libraries.constants import TRUE, FALSE
 from contracts.board.maze import cell_access
